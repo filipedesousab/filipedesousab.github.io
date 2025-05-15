@@ -1,0 +1,11 @@
+services:
+  jekyll:
+    image: jekyll/minimal
+    command:
+      - 'jekyll'
+      - 'serve'
+      - '--trace'
+    ports:
+      - 4000:4000
+    volumes:
+      - ./:/srv/jekyll
