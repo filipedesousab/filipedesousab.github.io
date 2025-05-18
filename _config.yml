@@ -23,11 +23,16 @@ author: ""
 email: filipedesousab@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   Blog construído com Jekyll e hospedado no GitHub.
-
+lang: pt-BR
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  filipedesousab
 linkedin_username: filipedesousab
+
+show_excerpts: true
+
+minima:
+  date_format: "%d/%m/%Y"
 
 # Build settings
 theme: minima
