@@ -1,0 +1,37 @@
+<header role="banner" class="menu">
+  {%- assign default_paths = site.pages | map: "path" -%}
+  {%- assign page_paths = site.header_pages | default: default_paths -%}
+
+
+  <nav class="site-nav">
+    <ul>
+      <li>
+        <a
+          class="page-link h"
+          rel="author"
+          href="{{ "/" | relative_url }}">
+          <span>H</span>ome</a>
+      </li>
+      {%- if page_paths -%}
+        {%- for path in page_paths -%}
+          {%- assign my_page = site.pages | where: "path", path | first -%}
+          {%- if my_page.title -%}
+            {% assign first_char = my_page.title | slice: 0 %}
+            {% assign anothers_char = my_page.title | slice: 1, 100 %}
+            {% assign name = '<span>' | append: first_char | append: '</span>' | append: anothers_char %}
+            <li>
+              <a class="page-link {{first_char | downcase}}" href="{{ my_page.url | relative_url }}">{{ name }}</a>
+            </li>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
+    </ul>
+  </nav>
+
+  <span class="site-title">
+    {{ site.title | escape }}
+    {%- if page.title -%}
+      {{ " - " }}{{ page.title | escape }}
+    {%- endif -%}
+  </span>
+</header>

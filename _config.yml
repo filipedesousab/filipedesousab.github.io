@@ -20,9 +20,8 @@
 
 title: Filipe Botelho
 author: ""
-email: filipedesousab@gmail.com
-description: >- # this means to ignore newlines until "baseurl:"
-  Blog construído com Jekyll e hospedado no GitHub.
+email:
+description: "Isso parece um bug, mas é uma feature!"
 lang: pt-BR
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
