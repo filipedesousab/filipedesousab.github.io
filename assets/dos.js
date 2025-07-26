@@ -53,8 +53,8 @@ Portanto, é provável que haja mais conteúdos relacionados ao RoR e tecnologia
 
 Bem vindo! {{ site.description | escape }}
 
-Digite 'gui' para acessar a interface gráfica.
-Digite 'help' para ver a lista de comandos disponíveis.\n\n`;
+Digite 'help' para ver a lista de comandos disponíveis.
+Digite 'gui' para acessar a interface gráfica.\n\n`;
 
     const p = document.createElement('p');
     p.textContent = welcomeText;
