@@ -1,20 +1,28 @@
 ---
-layout: home
 ---
-<div class="home-description">
-  <div class="image">
-    <img src="https://0.gravatar.com/avatar/23ee47aa1397bc9505bb51a887ad8971b821a749d41dc8654e5c9496ce76b28f?size=128">
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link
+    rel="shortcut icon"
+    type="image/x-icon"
+    href="{{ "/assets/dos-favicon.png" | relative_url }}">
+  <title>{{ site.title | escape }}</title>
+  <link rel="stylesheet" href="{{ "/assets/dos.css" | relative_url }}">
+</head>
+
+<body>
+  <div id="terminal">
+    <div id="output"></div>
+    <div class="input-area">
+        <span class="prompt">C:\></span>
+        <span id="input-line" contenteditable="true" spellcheck="false"></span>
+    </div>
   </div>
-  <div class="paragraphs">
-    <p>Sou desenvolvedor de software por diversão e jardineiro de profissão. Ou talvez o inverso também.</p>
-    <p>Esse blog é uma tentativa de concentrar meus conhecimentos e, futuramente, refletir sobre minha trajetória.</p>
-    <p>
-      Não sou inimigo de nenhuma tecnologia, mas sou um entusiasta de Ruby on Rails. 
-      Portanto, é provável que haja mais conteúdos relacionados ao RoR e tecnologias relacionadas.
-    </p>
-  </div>
-  <div class="social">
-    {%- include social.html -%}
-  </div>
-</div>
-<br>
+  <script src="{{ "/assets/dos.js" | relative_url }}"></script>
+</body>
+
+</html>

@@ -40,6 +40,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 case 'P':
                     document.querySelector('.page-link.p').focus()
                     break
+                case 's':
+                case 'S':
+                    document.querySelector('.page-link.s').focus()
+                    break
                 default:
                     document.querySelector('.page-link.h').focus()
             }

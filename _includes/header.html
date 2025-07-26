@@ -6,11 +6,7 @@
   <nav class="site-nav">
     <ul>
       <li>
-        <a
-          class="page-link h"
-          rel="author"
-          href="{{ "/" | relative_url }}">
-          <span>H</span>ome</a>
+        <a class="page-link h" rel="author" href="{{ "/gui" | relative_url }}"><span>H</span>ome</a>
       </li>
       {%- if page_paths -%}
         {%- for path in page_paths -%}
@@ -25,13 +21,16 @@
           {%- endif -%}
         {%- endfor -%}
       {%- endif -%}
+      <li>
+        <a class="page-link s" rel="author" href="{{ "/" | relative_url }}"><span>S</span>air</a>
+      </li>
     </ul>
   </nav>
 
   <span class="site-title">
     {{ site.title | escape }}
     {%- if page.title -%}
-      {{ " - " }}{{ page.title | escape }}
+    {{ " - " }}{{ page.title | escape }}
     {%- endif -%}
   </span>
 </header>

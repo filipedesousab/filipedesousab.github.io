@@ -58,6 +58,7 @@ $spacing-unit: 30px !default;
 * {
     font-family: DOS, IBM_VGA8, monospace;
     font-size: 22px;
+    line-height: 1.2;
 }
 
 body {
@@ -98,6 +99,7 @@ header.menu {
             list-style: none;
             float: left;
         }
+
         .page-link {
             padding: 2px 8px;
         }
@@ -136,7 +138,7 @@ header.menu {
             min-width: 100px;
 
             li {
-              float: none;
+                float: none;
             }
         }
     }
@@ -329,11 +331,8 @@ code>* {
 .modal-backdrop {
     color: #000;
     display: none;
-    /* Oculta o modal por padrão */
     position: fixed;
-    /* Fixa o modal na viewport */
     z-index: 1000;
-    /* Garante que ele fique acima de outros elementos */
     left: 0;
     top: 0;
     width: 100%;
@@ -368,13 +367,9 @@ code>* {
 
 .modal-content {
     margin: auto;
-    /* Largura padrão */
     max-width: 500px;
-    /* Largura máxima */
     position: relative;
-    /* Para posicionar o botão de fechar */
     animation: fadeIn 0.3s ease-out;
-    /* Animação simples de entrada */
 }
 
 .modal-footer {
