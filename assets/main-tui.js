@@ -7,36 +7,49 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const modal = document.getElementById('welcome')
+    let closeButton = undefined
+    let rememberButton = undefined
 
-    if (modal && !sessionStorage.getItem('modalShow')) {
-        const closeButton = modal.querySelector('.close-button')
+    if (modal && !localStorage.getItem('modalShow')) {
+        closeButton = modal.querySelector('#close-button')
+        rememberButton = modal.querySelector('#remember-button')
 
         function openModal() {
             modal.style.display = 'flex'
         }
         openModal()
 
-        function closeModal() {
-            sessionStorage.setItem('modalShow', true)
-            closeButton.classList.add('active')
+        function closeModal(event) {
+            if (event.target == rememberButton) localStorage.setItem('modalShow', true)
+
+            event.target.classList.add('active')
             setTimeout(() => {
-                closeButton.classList.remove('active')
+                event.target.classList.remove('active')
             }, 100);
             setTimeout(() => {
                 modal.style.display = 'none'
                 focusOnTheWrapper()
             }, 200);
         }
+
         closeButton.addEventListener('click', closeModal)
+        rememberButton.addEventListener('click', closeModal)
     } else {
         focusOnTheWrapper()
     }
 
-    function focusOnTheOpenModal() {
+    function focusOnTheOpenModal(event) {
         if (modal && window.getComputedStyle(modal).display === 'flex') {
-            setTimeout(() => {
-                modal.querySelector('.close-button').focus()
-            }, 200);
+            switch (event.key) {
+                case 'Enter':
+                    break;
+                case 'ArrowRight':
+                    rememberButton && rememberButton.focus()
+                    break
+                case 'ArrowLeft':
+                default:
+                    closeButton && closeButton.focus()
+            }
         }
     }
 
@@ -99,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     document.addEventListener('keydown', function (event) {
-        focusOnTheOpenModal()
+        focusOnTheOpenModal(event)
 
         if (event.altKey) {
             switch (event.key) {
