@@ -1,6 +1,10 @@
 document.addEventListener('DOMContentLoaded', function () {
+    function focusOnTheWrapper() {
+        const menuLink = document.querySelector('.site-nav a:focus')
+        if (menuLink) menuLink.blur()
 
-    let savedLink = undefined
+        document.querySelector('.internal-wrapper').focus()
+    }
 
     const modal = document.getElementById('welcome')
 
@@ -9,26 +13,93 @@ document.addEventListener('DOMContentLoaded', function () {
 
         function openModal() {
             modal.style.display = 'flex'
-            sessionStorage.setItem('modalShow', true)
         }
         openModal()
 
         function closeModal() {
+            sessionStorage.setItem('modalShow', true)
+            closeButton.classList.add('active')
+            setTimeout(() => {
+                closeButton.classList.remove('active')
+            }, 100);
             setTimeout(() => {
                 modal.style.display = 'none'
+                focusOnTheWrapper()
             }, 200);
         }
         closeButton.addEventListener('click', closeModal)
+    } else {
+        focusOnTheWrapper()
+    }
+
+    function focusOnTheOpenModal() {
+        if (modal && window.getComputedStyle(modal).display === 'flex') {
+            setTimeout(() => {
+                modal.querySelector('.close-button').focus()
+            }, 200);
+        }
+    }
+
+    function animateThePressedButton(event) {
+        const currentLink = document.querySelector('.internal-wrapper a:focus')
+        if (currentLink) {
+            event.preventDefault()
+            currentLink.classList.add('active')
+            setTimeout(() => {
+                currentLink.classList.remove('active')
+            }, 100);
+            setTimeout(() => {
+                if (currentLink.href) window.location.href = currentLink.href
+            }, 200);
+        }
+    }
+
+    function getVisibleLinks() {
+        const internalWrapper = document.querySelector('.internal-wrapper');
+        const allLinks = Array.from(document.querySelectorAll('.internal-wrapper a:not([hidden])'));
+        const internalWrapperRect = internalWrapper.getBoundingClientRect();
+
+        return allLinks.filter(link => {
+            const linkRect = link.getBoundingClientRect();
+            return linkRect.top < internalWrapperRect.bottom && linkRect.bottom > internalWrapperRect.top;
+        });
+    }
+
+    function selectLink(direction) {
+        const currentLink = document.querySelector('.internal-wrapper a:focus')
+        const visibleLinks = getVisibleLinks()
+
+        if (!currentLink) {
+            visibleLinks[0] && visibleLinks[0].focus({ preventScroll: true })
+            return
+        } else if (visibleLinks.length === 0) {
+            focusOnTheWrapper()
+            return
+        }
+
+        const currentLinkIndex = visibleLinks.indexOf(currentLink)
+
+        if (currentLinkIndex < 0) {
+            direction > 0 ? visibleLinks[0].focus({ preventScroll: true }) : visibleLinks[visibleLinks.length - 1].focus({ preventScroll: true })
+        }
+
+        const nextVisibleLink = visibleLinks[currentLinkIndex + direction]
+        nextVisibleLink && nextVisibleLink.focus({ preventScroll: true })
+    }
+
+    function selectMenuLink(direction) {
+        const currentMenuLink = document.querySelector('.site-nav a:focus')
+
+        if (!currentMenuLink) return
+
+        const menuLinkList = Array.from(document.querySelectorAll('.site-nav a'))
+        const currentMenuLinkIndex = menuLinkList.indexOf(currentMenuLink)
+        const nextLink = menuLinkList[currentMenuLinkIndex + direction] || currentMenuLink
+        nextLink.focus()
     }
 
     document.addEventListener('keydown', function (event) {
-        if (sessionStorage.getItem('modalShow')) {
-            setTimeout(() => {
-                modal.querySelector('.close-button').focus()
-            }, 100);
-        }
-        let currentLink = document.querySelector('a:focus')
-        let linkList = undefined;
+        focusOnTheOpenModal()
 
         if (event.altKey) {
             switch (event.key) {
@@ -45,57 +116,29 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.querySelector('.page-link.s').focus()
                     break
                 default:
+                    event.preventDefault()
                     document.querySelector('.page-link.h').focus()
             }
         } else {
             switch (event.key) {
                 case 'Escape':
-                    const menuLink = document.querySelector('a.page-link:focus')
-                    if (menuLink) menuLink.blur()
-                    const linkToFocus = savedLink || document.querySelector('.internal-wrapper a')
-                    linkToFocus.focus()
+                    focusOnTheWrapper()
                     break
                 case 'Enter':
-                    currentLink = document.querySelector('.internal-wrapper a:focus, .modal a:focus')
-                    currentLink.classList.add('active')
-                    setTimeout(() => {
-                        currentLink.classList.remove('active')
-                    }, 100);
+                    animateThePressedButton(event)
                     break
                 case 'ArrowDown':
-                    if (!currentLink) {
-                        savedLink = document.querySelector('.internal-wrapper a')
-                        savedLink.focus()
-                        break
-                    }
-                    currentLink = document.querySelector('.internal-wrapper a:focus')
-                    linkList = Array.from(document.querySelectorAll('.internal-wrapper a:not([hidden])'))
-                    savedLink = selectLink(currentLink, linkList) || savedLink
+                    selectLink(1)
                     break
                 case 'ArrowUp':
-                    currentLink = document.querySelector('.internal-wrapper a:focus')
-                    linkList = Array.from(document.querySelectorAll('.internal-wrapper a:not([hidden])')).reverse()
-                    savedLink = selectLink(currentLink, linkList) || savedLink
+                    selectLink(-1)
                     break
                 case 'ArrowRight':
-                    currentLink = document.querySelector('.site-nav a:focus')
-                    linkList = Array.from(document.querySelectorAll('.site-nav a'))
-                    selectLink(currentLink, linkList)
+                    selectMenuLink(1)
                     break
                 case 'ArrowLeft':
-                    currentLink = document.querySelector('.site-nav a:not([hidden]):focus')
-                    linkList = Array.from(document.querySelectorAll('.site-nav a:not([hidden])')).reverse()
-                    selectLink(currentLink, linkList)
+                    selectMenuLink(-1)
             }
-        }
-
-        function selectLink(currentLink, linkList) {
-            const currentLinkIndex = linkList.indexOf(currentLink)
-            if (currentLinkIndex === -1) return undefined
-
-            const nextLink = linkList[currentLinkIndex + 1] || currentLink
-            nextLink.focus()
-            return nextLink
         }
     });
 });

@@ -180,6 +180,10 @@ header.menu {
     &>* {
         padding: 8px;
     }
+
+    &:focus {
+        outline: none;
+    }
 }
 
 .internal-wrapper::-webkit-scrollbar {
