@@ -1,3 +1,5 @@
+---
+---
 function parseRSS(xmlString) {
   const parser = new DOMParser()
   const xmlDoc = parser.parseFromString(xmlString, 'text/xml')
@@ -86,7 +88,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   post list             - Listar posts.
   post summary <indice> - Exibir resumo de um post específico.
   post open <indice>    - Abrir um post específico.
-  cls                   - Limpar a tela do terminal.`,
+  cls                   - Limpar a tela do terminal.
+  exit                  - Sair do terminal.`,
 
     about: `\nSou desenvolvedor de software por diversão e jardineiro de profissão. Ou talvez o inverso também.
 Esse blog é uma tentativa de concentrar meus conhecimentos e, futuramente, refletir sobre minha trajetória.\n
@@ -100,6 +103,9 @@ Portanto, é provável que haja mais conteúdos relacionados ao RoR e tecnologia
 {% if site.linkedin_username %}
   LinkedIn:   linkedin.com/in/{{ site.linkedin_username | escape }}
 {%- endif -%}`,
+
+    exit: '\nOxi. Não posso fechar teu navegar. Tu mesmo que tem que fechar. Gudibái.',
+
     cls: ''
   }
 
@@ -210,6 +216,7 @@ Digite 'tui' para acessar a interface TUI.\n\n`
       } else {
         showCommandLine()
       }
+      sessionStorage.setItem('dosHistory', output.innerHTML)
       terminal.scrollTop = terminal.scrollHeight
     } else if (event.key === 'ArrowLeft') {
       event.preventDefault()
