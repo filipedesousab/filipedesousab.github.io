@@ -27,27 +27,45 @@ class WelcomeModal {
         return !!this.modal
     }
 
+    static modalIsOpen() {
+        return this.loaded() && this.modal.style.display === 'flex'
+    }
+
+    static storageName() {
+        return 'modalShow'
+    }
+
     static rememberedClosing() {
-        return localStorage.getItem('modalShow') === 'true'
+        return localStorage.getItem(this.storageName()) === 'true' || sessionStorage.getItem(this.storageName()) === 'true'
     }
 
     static rememberClosing() {
-        localStorage.setItem('modalShow', true)
+        localStorage.setItem(this.storageName(), true)
+    }
+
+    static rememberClosingInTheSession() {
+        sessionStorage.setItem(this.storageName(), true)
     }
 
     static forgetClosing() {
-        localStorage.setItem('modalShow', false)
+        localStorage.setItem(this.storageName(), false)
     }
 
     static open() {
+        this.forgetClosing()
         this.modal.style.display = 'flex'
     }
 
-    static modalIsOpen() {
-        return this.modal.style.display === 'flex'
+    static tryToOpen() {
+        if (this.loaded() && !this.rememberedClosing()) {
+            this.open()
+            return true
+        }
+        return false
     }
 
     static close(event) {
+        this.rememberClosingInTheSession()
         event.target.classList.add('active')
         setTimeout(() => {
             event.target.classList.remove('active')
@@ -87,12 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     WelcomeModal.load()
     WelcomeModal.addAfterCloseHook(focusOnTheWrapper)
-
-    if (WelcomeModal.loaded() && !WelcomeModal.rememberedClosing()) {
-        WelcomeModal.open()
-    } else {
-        focusOnTheWrapper()
-    }
+    WelcomeModal.tryToOpen() || focusOnTheWrapper()
 
     function animateThePressedButton(event) {
         const currentLink = document.querySelector('.internal-wrapper a:focus')
@@ -153,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     document.addEventListener('keydown', function (event) {
-        if (WelcomeModal.loaded() && WelcomeModal.modalIsOpen()) {
+        if (WelcomeModal.modalIsOpen()) {
             WelcomeModal.navegate(event)
             return
         }

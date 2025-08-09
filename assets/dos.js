@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const output = document.getElementById('output');
   const inputLine = document.getElementById('input-line');
 
-  let commandHistory = sessionStorage.getItem('commandHistory');
+  let commandHistory = localStorage.getItem('commandHistory');
   commandHistory = commandHistory ? commandHistory.split(',') : [];
   let historyIndex = commandHistory.length;
 
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     help: `Comandos disponíveis:
 
   help      - Mostrar esta lista de comandos.
-  gui       - Abrir interface gráfica.
+  tui       - Abrir interface TUI.
   about     - Exibir informações sobre mim.
   posts     - Listar posts.
   contact   - Mostrar minhas informações de contato.
@@ -49,12 +49,12 @@ Portanto, é provável que haja mais conteúdos relacionados ao RoR e tecnologia
     }
 
     const welcomeText = `DOS like (v1.0)
-(c) 2025 Filipe Botelho. Todos os direitos reservados.
+(C) 2025 Filipe Botelho. Todos os direitos reservados.
 
 Bem vindo! {{ site.description | escape }}
 
 Digite 'help' para ver a lista de comandos disponíveis.
-Digite 'gui' para acessar a interface gráfica.\n\n`;
+Digite 'tui' para acessar a interface TUI.\n\n`;
 
     const p = document.createElement('p');
     p.textContent = welcomeText;
@@ -68,8 +68,8 @@ Digite 'gui' para acessar a interface gráfica.\n\n`;
 
     if (command === 'clear') {
       output.innerHTML = '';
-    } else if (command === 'gui') {
-      window.location.href = '/gui';
+    } else if (command === 'tui') {
+      window.location.href = '/tui';
       sessionStorage.setItem('dosHistory', output.innerHTML)
     } else if (commands[command]) {
       const response = document.createElement('p');
@@ -89,7 +89,7 @@ Digite 'gui' para acessar a interface gráfica.\n\n`;
 
       if (command) {
         commandHistory.push(command);
-        sessionStorage.setItem('commandHistory', commandHistory)
+        localStorage.setItem('commandHistory', commandHistory)
         historyIndex = commandHistory.length;
         executeCommand(command);
         inputLine.textContent = '';
