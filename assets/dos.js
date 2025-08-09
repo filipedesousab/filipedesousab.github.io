@@ -1,33 +1,97 @@
----
----
-document.addEventListener('DOMContentLoaded', () => {
-  const terminal = document.getElementById('terminal');
-  const output = document.getElementById('output');
-  const inputLine = document.getElementById('input-line');
+function parseRSS(xmlString) {
+  const parser = new DOMParser()
+  const xmlDoc = parser.parseFromString(xmlString, 'text/xml')
+  const items = xmlDoc.getElementsByTagName('entry')
+  const result = []
 
-  let commandHistory = localStorage.getItem('commandHistory');
-  commandHistory = commandHistory ? commandHistory.split(',') : [];
-  let historyIndex = commandHistory.length;
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i]
+
+    const dateOptions = {
+      timeZone: 'America/Sao_Paulo',
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric'
+    }
+    const date = new Date(item.getElementsByTagName('published')[0].textContent)
+    const formattedDate = date.toLocaleDateString('pt-BR', dateOptions)
+
+    result.push({
+      title: item.getElementsByTagName('title')[0].textContent,
+      link: item.getElementsByTagName('link')[0].attributes.href.value,
+      published: formattedDate,
+      summary: item.getElementsByTagName('summary')[0].textContent,
+    })
+  }
+
+  return result
+}
+
+async function fetchRSS() {
+  try {
+    const response = await fetch('/feed.xml')
+    if (!response.ok) {
+      throw new Error(`Falha ao obter lista de posts.`)
+    }
+    return await response.text()
+  } catch (error) {
+    return error.message
+  }
+}
+
+async function loadPosts() {
+  const posts = await fetchRSS()
+  return parseRSS(posts).reverse()
+}
+
+async function checkPostExists(index) {
+  const posts = await loadPosts()
+  return posts[index - 1] !== undefined
+}
+
+async function getPostTitles() {
+  const posts = await loadPosts()
+
+  return posts.reduceRight((acc, post, index) => {
+    return `${acc}\n  ${index + 1}. ${post.published} - ${post.title}`
+  }, '')
+}
+
+async function getPostSummary(index) {
+  const posts = await loadPosts()
+  return posts[index - 1].summary
+}
+
+async function getPostLink(index) {
+  const posts = await loadPosts()
+  return posts[index - 1].link
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const terminal = document.getElementById('terminal')
+  const output = document.getElementById('output')
+  const inputLine = document.getElementById('input-line')
+
+  let commandHistory = localStorage.getItem('commandHistory')
+  commandHistory = commandHistory ? commandHistory.split(',') : []
+  let historyIndex = commandHistory.length
 
   const commands = {
     help: `Comandos disponíveis:
 
-  help      - Mostrar esta lista de comandos.
-  tui       - Abrir interface TUI.
-  about     - Exibir informações sobre mim.
-  posts     - Listar posts.
-  contact   - Mostrar minhas informações de contato.
-  clear     - Limpar a tela do terminal.`,
+  help                  - Mostrar esta lista de comandos.
+  tui                   - Abrir interface TUI.
+  about                 - Exibir informações sobre mim.
+  contact               - Mostrar minhas informações de contato.
+  post list             - Listar posts.
+  post summary <indice> - Exibir resumo de um post específico.
+  post open <indice>    - Abrir um post específico.
+  cls                   - Limpar a tela do terminal.`,
 
     about: `\nSou desenvolvedor de software por diversão e jardineiro de profissão. Ou talvez o inverso também.
 Esse blog é uma tentativa de concentrar meus conhecimentos e, futuramente, refletir sobre minha trajetória.\n
 Não sou inimigo de nenhuma tecnologia, mas sou um entusiasta de Ruby on Rails.
 Portanto, é provável que haja mais conteúdos relacionados ao RoR e tecnologias relacionadas.`,
-
-    posts: `{% for post in site.posts %}
-  {%- assign date_format = site.minima.date_format | default: "%b %-d, %Y" -%}
-  \n {{ forloop.index }}. {{ post.date | date: date_format }} - {{ post.title | escape }}
-{%- endfor -%}`,
 
     contact: `Você pode me encontrar em:
 {% if site.github_username %}
@@ -36,16 +100,15 @@ Portanto, é provável que haja mais conteúdos relacionados ao RoR e tecnologia
 {% if site.linkedin_username %}
   LinkedIn:   linkedin.com/in/{{ site.linkedin_username | escape }}
 {%- endif -%}`,
-
-    clear: ''
-  };
+    cls: ''
+  }
 
   function showWelcomeMessage() {
-    const dosHistory = sessionStorage.getItem('dosHistory');
+    const dosHistory = sessionStorage.getItem('dosHistory')
 
     if (dosHistory) {
-      output.innerHTML = dosHistory;
-      return;
+      output.innerHTML = dosHistory
+      return
     }
 
     const welcomeText = `DOS like (v1.0)
@@ -54,87 +117,136 @@ Portanto, é provável que haja mais conteúdos relacionados ao RoR e tecnologia
 Bem vindo! {{ site.description | escape }}
 
 Digite 'help' para ver a lista de comandos disponíveis.
-Digite 'tui' para acessar a interface TUI.\n\n`;
+Digite 'tui' para acessar a interface TUI.\n\n`
 
-    const p = document.createElement('p');
-    p.textContent = welcomeText;
-    output.appendChild(p);
+    const p = document.createElement('p')
+    p.textContent = welcomeText
+    output.appendChild(p)
   }
 
-  function executeCommand(command) {
-    const commandOutputLine = document.createElement('p');
-    commandOutputLine.innerHTML = `<span class="prompt">C:\\></span>${command}`;
-    output.appendChild(commandOutputLine);
+  function showCommandLine(command = '') {
+    const commandOutputLine = document.createElement('p')
+    commandOutputLine.innerHTML = `<span class="prompt">C:\\></span>${command}`
+    output.appendChild(commandOutputLine)
+  }
 
-    if (command === 'clear') {
-      output.innerHTML = '';
-    } else if (command === 'tui') {
-      window.location.href = '/tui';
-      sessionStorage.setItem('dosHistory', output.innerHTML)
-    } else if (commands[command]) {
-      const response = document.createElement('p');
-      response.textContent = `${commands[command]}\n\n`;
-      output.appendChild(response);
-    } else {
-      const error = document.createElement('p');
-      error.textContent = `Comando '${command}' não reconhecido. Digite 'help' para ajuda.\n\n`;
-      output.appendChild(error);
+  function showCommandReturn(command, text) {
+    showCommandLine(command)
+    const p = document.createElement('p')
+    p.textContent = `${text}\n\n`
+    output.appendChild(p)
+  }
+
+  function showCommandNotFound(command) {
+    showCommandReturn(command, `Comando '${command}' não encontrado. Digite 'help' para ajuda.`)
+  }
+
+  async function executeCommand(command) {
+    const firstCommand = command.split(' ')[0]
+    const secondCommand = command.split(' ')[1]
+
+    switch (firstCommand) {
+      case 'cls':
+        if (secondCommand) {
+          showCommandNotFound(command)
+          break
+        }
+        output.innerHTML = ''
+        break
+      case 'tui':
+        if (secondCommand) {
+          showCommandNotFound(command)
+          break
+        }
+        showCommandLine(command)
+        sessionStorage.setItem('dosHistory', output.innerHTML)
+        window.location.href = '/tui'
+        break
+      case 'post':
+        const thirdCommand = parseInt(command.split(' ')[2])
+        const postExists = thirdCommand && await checkPostExists(thirdCommand)
+
+        if (secondCommand === 'list' && !thirdCommand) {
+          showCommandReturn(command, await getPostTitles())
+          break
+        } else if (secondCommand === 'summary') {
+          if (postExists) {
+            showCommandReturn(command, await getPostSummary(thirdCommand))
+          } else {
+            showCommandReturn(command, `Post não encontrado.`)
+          }
+          break
+        } else if (secondCommand === 'open') {
+          if (postExists) {
+            showCommandLine(command)
+            sessionStorage.setItem('dosHistory', output.innerHTML)
+            window.location.href = await getPostLink(thirdCommand)
+          } else {
+            showCommandReturn(command, `Post não encontrado.`)
+          }
+          break
+        }
+      default:
+        if (commands[command]) {
+          showCommandReturn(command, `${commands[command]}`)
+        } else {
+          showCommandNotFound(command)
+        }
+        break
     }
   }
 
-  inputLine.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      const command = inputLine.textContent.trim().toLowerCase();
+  inputLine.addEventListener('keydown', async (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      const command = inputLine.textContent.trim().toLowerCase()
 
       if (command) {
-        commandHistory.push(command);
+        commandHistory.push(command)
         localStorage.setItem('commandHistory', commandHistory)
-        historyIndex = commandHistory.length;
-        executeCommand(command);
-        inputLine.textContent = '';
+        historyIndex = commandHistory.length
+        await executeCommand(command)
+        inputLine.textContent = ''
       } else {
-        const emptyLine = document.createElement('p');
-        emptyLine.innerHTML = `<span class="prompt">C:\\></span>`;
-        output.appendChild(emptyLine);
+        showCommandLine()
       }
-      terminal.scrollTop = terminal.scrollHeight;
-    } else if (e.key === 'ArrowLeft') {
-      e.preventDefault();
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
+      terminal.scrollTop = terminal.scrollHeight
+    } else if (event.key === 'ArrowLeft') {
+      event.preventDefault()
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault()
       if (historyIndex > 0) {
-        historyIndex--;
-        inputLine.textContent = commandHistory[historyIndex];
-        placeCursorAtEnd();
+        historyIndex--
+        inputLine.textContent = commandHistory[historyIndex]
+        placeCursorAtEnd()
       }
-    } else if (e.key === 'ArrowDown') {
-      e.preventDefault();
+    } else if (event.key === 'ArrowDown') {
+      event.preventDefault()
       if (historyIndex < commandHistory.length - 1) {
-        historyIndex++;
-        inputLine.textContent = commandHistory[historyIndex];
-        placeCursorAtEnd();
+        historyIndex++
+        inputLine.textContent = commandHistory[historyIndex]
+        placeCursorAtEnd()
       } else if (historyIndex === commandHistory.length - 1) {
-        historyIndex++;
-        inputLine.textContent = '';
+        historyIndex++
+        inputLine.textContent = ''
       }
     }
-  });
+  })
 
   terminal.addEventListener('click', () => {
-    inputLine.focus();
-  });
+    inputLine.focus()
+  })
 
   function placeCursorAtEnd() {
-    inputLine.focus();
-    const range = document.createRange();
-    range.selectNodeContents(inputLine);
-    range.collapse(false);
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
+    inputLine.focus()
+    const range = document.createRange()
+    range.selectNodeContents(inputLine)
+    range.collapse(false)
+    const sel = window.getSelection()
+    sel.removeAllRanges()
+    sel.addRange(range)
   }
 
-  showWelcomeMessage();
-  inputLine.focus();
-});
+  showWelcomeMessage()
+  inputLine.focus()
+})
