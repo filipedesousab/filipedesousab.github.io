@@ -12,6 +12,9 @@
     href="{{ "/assets/dos-favicon.png" | relative_url }}">
   <title>{{ site.title | escape }}</title>
   <link rel="stylesheet" href="{{ "/assets/dos.css" | relative_url }}">
+  {%- if jekyll.environment == 'production' and site.google_analytics -%}
+    {%- include google-analytics.html -%}
+  {%- endif -%}
 </head>
 
 <body>
