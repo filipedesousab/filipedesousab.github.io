@@ -79,17 +79,49 @@ document.addEventListener('DOMContentLoaded', async () => {
   let historyIndex = commandHistory.length
 
   const commands = {
-    help: `Comandos disponíveis:
-
-  help                  - Mostrar esta lista de comandos.
-  tui                   - Abrir interface TUI.
-  about                 - Exibir informações sobre mim.
-  contact               - Mostrar minhas informações de contato.
-  post list             - Listar posts.
-  post summary <indice> - Exibir resumo de um post específico.
-  post open <indice>    - Abrir um post específico.
-  cls                   - Limpar a tela do terminal.
-  exit                  - Sair do terminal.`,
+    help: `
+  <table id="help-table">
+  <tr>
+    <th>Comando</th>
+    <th>Descrição</th>
+  </tr>
+  <tr>
+    <td>help</td>
+    <td>Mostrar esta lista de comandos.</td>
+  </tr>
+  <tr>
+    <td>tui</td>
+    <td>Abrir interface TUI.</td>
+  </tr>
+  <tr>
+    <td>about</td>
+    <td>Exibir informações sobre mim.</td>
+  </tr>
+  <tr>
+    <td>contact</td>
+    <td>Mostrar minhas informações de contato.</td>
+  </tr>
+  <tr>
+    <td>post list</td>
+    <td>Listar posts.</td>
+  </tr>
+  <tr>
+    <td>post summary &lt;indice&gt;</td>
+    <td>Exibir resumo de um post específico.</td>
+  </tr>
+  <tr>
+    <td>post open &lt;indice&gt;</td>
+    <td>Abrir um post específico.</td>
+  </tr>
+  <tr>
+    <td>cls</td>
+    <td>Limpar a tela do terminal.</td>
+  </tr>
+  <tr>
+    <td>exit</td>
+    <td>Sair do terminal.</td>
+  </tr>
+  </table>`,
 
     about: `\nSou desenvolvedor de software por diversão e jardineiro de profissão. Ou talvez o inverso também.
 Esse blog é uma tentativa de concentrar meus conhecimentos e, futuramente, refletir sobre minha trajetória.\n
@@ -152,6 +184,12 @@ Digite 'tui' para acessar a interface TUI.\n\n`
     const secondCommand = command.split(' ')[1]
 
     switch (firstCommand) {
+      case 'help':
+        showCommandLine(command)
+        const div = document.createElement('div')
+        div.innerHTML = commands.help
+        output.appendChild(div)
+        break
       case 'cls':
         if (secondCommand) {
           showCommandNotFound(command)
@@ -257,4 +295,3 @@ Digite 'tui' para acessar a interface TUI.\n\n`
   showWelcomeMessage()
   inputLine.focus()
 })
-
