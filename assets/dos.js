@@ -257,3 +257,4 @@ Digite 'tui' para acessar a interface TUI.\n\n`
   showWelcomeMessage()
   inputLine.focus()
 })
+
