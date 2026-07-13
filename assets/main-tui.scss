@@ -153,7 +153,7 @@ header.menu {
     background: $content-background-color;
     padding: 0 20px;
     width: max-content;
-    max-width: calc(100vw - 70px);
+    max-width: calc(60vw - 70px);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -183,6 +183,10 @@ header.menu {
 
     &:focus {
         outline: none;
+    }
+
+    img {
+      max-width: 100%;
     }
 }
 
@@ -285,6 +289,11 @@ a {
 
 .post-meta {
     color: $text-color;
+}
+
+blockquote {
+  background-color: #ffffff4a;
+  padding: 1px 10px;
 }
 
 pre,
