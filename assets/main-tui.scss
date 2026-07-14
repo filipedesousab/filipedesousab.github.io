@@ -152,12 +152,36 @@ header.menu {
     transform: translate(-50%);
     color: $title-color;
     background: $content-background-color;
-    padding: 0 20px;
     width: max-content;
     max-width: calc(100% - 40px);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+
+    .site-title-window {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin: 0 20px;
+    }
+
+    &.is-scrolling .site-title-window {
+        text-overflow: clip;
+
+        .site-title-text {
+            display: inline-block;
+            padding-right: 3em;
+            animation: site-title-scroll 16s linear infinite;
+        }
+    }
+}
+
+@keyframes site-title-scroll {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
 }
 
 .external-wrapper {

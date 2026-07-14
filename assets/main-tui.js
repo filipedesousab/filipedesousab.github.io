@@ -107,6 +107,26 @@ document.addEventListener('DOMContentLoaded', function () {
     WelcomeModal.addAfterCloseHook(focusOnTheWrapper)
     WelcomeModal.tryToOpen() || focusOnTheWrapper()
 
+    function setUpSiteTitleScroll() {
+        const siteTitle = document.querySelector('.site-title')
+        const siteTitleWindow = siteTitle && siteTitle.querySelector('.site-title-window')
+        const siteTitleText = siteTitleWindow && siteTitleWindow.querySelector('.site-title-text')
+        if (!siteTitle || !siteTitleWindow || !siteTitleText) return
+
+        if (siteTitleText.scrollWidth > siteTitleWindow.clientWidth) {
+            const clone = siteTitleText.cloneNode(true)
+            clone.setAttribute('aria-hidden', 'true')
+            siteTitleText.after(clone)
+            siteTitle.classList.add('is-scrolling')
+        }
+    }
+
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(setUpSiteTitleScroll)
+    } else {
+        setUpSiteTitleScroll()
+    }
+
     function animateThePressedButton(event) {
         const currentLink = document.querySelector('.internal-wrapper a:focus')
         if (currentLink) {

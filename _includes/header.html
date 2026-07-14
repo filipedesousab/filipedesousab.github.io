@@ -31,9 +31,13 @@
   </nav>
 
   <span class="site-title">
-    {{ site.title | escape }}
-    {%- if page.title -%}
-    {{ " - " }}{{ page.title | escape }}
-    {%- endif -%}
+    <span class="site-title-window">
+      <span class="site-title-text">
+        {{ site.title | escape }}
+        {%- if page.title -%}
+        {{ " - " }}{{ page.title | escape }}
+        {%- endif -%}
+      </span>
+    </span>
   </span>
 </header>
