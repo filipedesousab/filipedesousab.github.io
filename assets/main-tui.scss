@@ -83,6 +83,7 @@ body {
 }
 
 header.menu {
+    position: relative;
     color: $text-header-color;
     background-color: $light-gray-color;
     color: black;
@@ -153,7 +154,7 @@ header.menu {
     background: $content-background-color;
     padding: 0 20px;
     width: max-content;
-    max-width: calc(60vw - 70px);
+    max-width: calc(100% - 40px);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
